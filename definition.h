@@ -1,0 +1,22 @@
+#ifndef _DEFINATION
+#define _DEFINATION
+
+
+enum{
+    SIG_SESSION_REQUSET_OPEN,
+    SIG_SESSION_REQUEST_CLOSE,
+    SIG_SESSION_REPLY_ALLOW,
+    SIG_SESSION_REPLY_DENY,
+    
+    
+};
+
+
+#define MSG_QUEUE_ADDR "/W2A_Queue"
+#define MSG_QUEUE_MAXMSG 10
+#define MSG_QUEUE_MSGSIZE 255
+
+#define LISTEN_PORT 5001
+#define MAX_CLIENT 256
+
+#endif
