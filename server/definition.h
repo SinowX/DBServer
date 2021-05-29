@@ -16,7 +16,7 @@ enum{
 #define MSG_QUEUE_MAXMSG 10
 #define MSG_QUEUE_MSGSIZE 255
 
-#define LISTEN_PORT 5001
+#define LISTEN_PORT 5000
 #define MAX_CLIENT 256
 
 #endif
