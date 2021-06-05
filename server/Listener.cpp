@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     server_addr.sin_family=AF_INET;
     server_addr.sin_port=htons(LISTEN_PORT);
-    server_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
+    server_addr.sin_addr.s_addr=inet_addr(LISTEN_ADDR);
     
     if(bind(listen_fd,(struct sockaddr*)&server_addr,sizeof(server_addr))==-1)
     {
@@ -95,15 +95,15 @@ int main(int argc, char *argv[])
                 printf("%s\n",str);
                 char *arguments[]={str,NULL};
                 if(execve("Worker",arguments,NULL)==-1)
-                    pError(errno);
+                    printf("ERROR EXECVE: %s\n",strerror(errno));
                 break;
             }
             default:
             {
                 if(close(accept_fd)==-1)
-                    pError(errno);
+                    printf("ERROR CLOSE FD: %s\n",strerror(errno));
                 else
-                    printf("Close this Accept_fd\n");
+                    printf("CLOSE FD SUCCESS\n");
                 break;
             }
             }

@@ -14,9 +14,12 @@ enum{
 
 #define MSG_QUEUE_ADDR "/W2A_Queue"
 #define MSG_QUEUE_MAXMSG 10
-#define MSG_QUEUE_MSGSIZE 255
+#define MSG_QUEUE_MSGSIZE 8192 // linux sys limits
 
 #define LISTEN_PORT 5000
+#define LISTEN_ADDR "127.0.0.1"
 #define MAX_CLIENT 256
+#define BUF_SZ 8192
+
 
 #endif

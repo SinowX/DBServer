@@ -6,21 +6,25 @@
 // #include<unistd.h>
 #include<errno.h>
 #include<string.h>
-#include"definition.h"
+#include"../server/definition.h"
 
 
 int main()
 {
     struct mq_attr *attr=(struct mq_attr*)malloc(sizeof(struct mq_attr));
-
+    printf("1");
     mqd_t msg_q;
     if((msg_q=mq_open(MSG_QUEUE_ADDR,O_WRONLY))==-1)
+    {
         printf("ERROR: %s\n",strerror(errno));
-    
+        exit(-1);
+    }
+        
+    printf("2");
     char msg[]="This is the Hello World For POSIX M_QUEUE";
     mq_send(msg_q,msg,sizeof(msg),1 );
     printf("%d\n",sizeof(msg));
-
+printf("3");
     // mq_getattr(msg_q,attr);
 
     // char *rev=(char *)malloc(50*sizeof(char));

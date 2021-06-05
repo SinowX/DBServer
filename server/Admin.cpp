@@ -40,7 +40,8 @@ static void MQThread(union sigval sv)
     while((msgnum=mq_receive(msg_q,buff,MSG_QUEUE_MSGSIZE,NULL))>=0)
     {
         printf("Read %d bytes\n",msgnum);
-        printf("%s\n",buff);
+        printf("%s",buff);
+        //在本函数中处理Worker发送数据
     }
 
     free(buff);
@@ -57,8 +58,29 @@ void RegisterNofify(mqd_t *msg_q)
     mq_notify(*msg_q,notification);
 }
 
+void secureINTR(int sig)
+{
+    printf("Admin Caught INTR\n");
+    if(sig==SIGINT)
+    {
+        mq_unlink(MSG_QUEUE_ADDR);
+    }
+    exit(0);
+}
+
 int main()
 {
+
+    struct sigaction *act=(struct sigaction*)malloc(sizeof(struct sigaction));
+    act->sa_handler=secureINTR;
+
+    if(sigaction(SIGINT,act,NULL)==-1)
+    {
+        pError(errno);
+        exit(0);
+    }
+
+
     mqd_t msg_q;
     CreateMQ(&msg_q);
     RegisterNofify(&msg_q);
@@ -66,11 +88,11 @@ int main()
 
     
     
-
-
-
-    sleep(30);
-
+    while (true)
+    {
+        pause();
+    }
+    
     mq_unlink(MSG_QUEUE_ADDR);    
     exit(0);
 
