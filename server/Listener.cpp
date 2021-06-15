@@ -10,12 +10,12 @@
 #include<arpa/inet.h>
 #include<sys/wait.h>
 #include"function.h"
-#include"definition.h"
+#include"../unidef/definition.h"
 #include<signal.h>
 
 int curFd=-1;
 int listenFd=-1;
-
+uint workerNumber=0;
 void secureINTR(int sig)
 {
     printf("Listener Caught INTR\n");
@@ -93,13 +93,21 @@ int main(int argc, char *argv[])
                 if(sprintf(str,"%d",accept_fd)==-1)
                     pError(errno);
                 printf("%s\n",str);
-                char *arguments[]={str,NULL};
+                char *wnum=(char *)malloc(10*sizeof(char));
+                if(sprintf(wnum,"%d",workerNumber)==-1)
+                    pError(errno);
+                
+                char *arguments[]={wnum,str,NULL};
                 if(execve("Worker",arguments,NULL)==-1)
                     printf("ERROR EXECVE: %s\n",strerror(errno));
                 break;
             }
             default:
             {
+                workerNumber++;
+                if(workerNumber==0)
+                    printf("WORKER FULL NOW\n");
+
                 if(close(accept_fd)==-1)
                     printf("ERROR CLOSE FD: %s\n",strerror(errno));
                 else

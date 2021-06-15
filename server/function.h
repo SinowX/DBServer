@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<signal.h>
-#include"definition.h"
+#include"../unidef/definition.h"
 
 
 void pError(int errcode)
