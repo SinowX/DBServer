@@ -720,7 +720,7 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
     }
     else if(!strcmp(the_pack.act,"session_off"))
     {
-        uni_cmd->action=CMD::SESSION_OPEN;
+        uni_cmd->action=CMD::SESSION_CLOSE;
     }
     else
     {

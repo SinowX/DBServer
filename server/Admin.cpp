@@ -60,7 +60,7 @@ static void MQThread(union sigval sv)
         sprintf(path,"./fifo/%d",uni_cmd.workerNumber);
         // strcpy(path,"/home/sinow/123");
         errno=0;
-        mkfifo(path,S_IRUSR|S_IWUSR)==-1&&errno!=EEXIST;
+        mkfifo(path,S_IRUSR|S_IWUSR);
         // if(mkfifo(path,S_IRUSR|S_IWUSR)==-1&&errno!=EEXIST)
         //     printf("ERROR mkfifo(): %s\n",strerror(errno));
         // else
