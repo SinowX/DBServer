@@ -67,7 +67,7 @@ namespace CMD{
 #define MSG_QUEUE_MSGSIZE 8192 // linux sys limits
 
 #define LISTEN_PORT 5000
-#define LISTEN_ADDR "127.0.0.1"
+#define LISTEN_ADDR "0.0.0.0"
 #define MAX_CLIENT 256
 #define BUF_SZ 8192
 
