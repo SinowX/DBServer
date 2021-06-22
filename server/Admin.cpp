@@ -135,13 +135,21 @@ static void MQThread(union sigval sv)
                             uni_cmd.select_col[i].next=NULL;
                     }
 
-                    for(int i=0;i<uni_cmd.condi_num;i++)
+                    if(uni_cmd.condi_num==0)
                     {
-                        if(i!=uni_cmd.condi_num-1)
-                            uni_cmd.condi[i].next=&uni_cmd.condi[i+1];
-                        else
-                            uni_cmd.condi[i].next=NULL;
+                        condi=NULL;
                     }
+                    else{
+                        for(int i=0;i<uni_cmd.condi_num;i++)
+                        {
+                            if(i!=uni_cmd.condi_num-1)
+                                uni_cmd.condi[i].next=&uni_cmd.condi[i+1];
+                            else
+                                uni_cmd.condi[i].next=NULL;
+                        }
+                    }
+
+                    
 
 
                     // 如果错误，应该返回错误信息，并由fifo_buff 发送给worker

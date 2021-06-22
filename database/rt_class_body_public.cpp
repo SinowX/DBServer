@@ -431,12 +431,6 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
         
 
 
-
-
-
-
-        
-
         // 获取索引成功 当前索引树保存在 idx_itm ， 索引 value 在 workptr->second
         if(found_value2data_table)
         {
@@ -1055,7 +1049,8 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
     }
     else{
         // condi 为空
-        int row_cnt=(this->data_tb.storage_table[0].cur_offset-this->data_tb.storage_table[0].offset)/sizeof(val_union);
+        // int row_cnt=(this->data_tb.storage_table[0].cur_offset-this->data_tb.storage_table[0].offset)/sizeof(val_union);
+        int row_cnt=(this->data_tb.storage_table[0].cur_offset-this->data_tb.storage_table[0].offset)/sizeof(row_itm);
         off_t offset=this->data_tb.storage_table[0].offset;
         for(int i=0;i<row_cnt;i++)
         {
@@ -1096,10 +1091,13 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
                 }
             }
 
-            if(col->next==NULL)
+            if(workcolptr->next==NULL)
             {
                 string_swapper.append("\n");
                 break;
+            }
+            else{
+                workcolptr=workcolptr->next;
             }
         }
     }
@@ -1117,16 +1115,21 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
     
     // row_item row_itm[this->data_tb.col_num];
 
-    std::queue<int> col_idx_copy=col_idx;
+    // std::queue<int> col_idx_copy=col_idx;
+
+    std::queue<int> col_idx_copy;
 
     while(!offset_final.empty())
     {
-        
+        col_idx_copy=col_idx;
 
         if(lseek(this->fd,offset_final.top(),SEEK_SET)==-1)
                 pError();
-        if(read(this->fd,&row_itm,sizeof(row_itm))==-1)
+        int num=read(this->fd,&row_itm,sizeof(row_itm));
+        if(num==-1)
             pError();
+        // if(read(this->fd,&row_itm,sizeof(row_itm))==-1)
+        //     pError();
 
         offset_final.pop();
 

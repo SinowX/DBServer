@@ -598,121 +598,127 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
                 }
             }
         }
-            
+        
+        
         //condi
 
-        uint8_t semiColonCnt=0;
-        int semiColonIndex[MAX_COLUMN];
-        for(int i=0;i<strlen(the_pack.condi);i++)
+        if(strlen(the_pack.condi)==0)
         {
-            if(the_pack.condi[i]==';')
+            //不限制条件
+            uni_cmd->condi_num=0;
+        }else{
+            uint8_t semiColonCnt=0;
+            int semiColonIndex[MAX_COLUMN];
+            for(int i=0;i<strlen(the_pack.condi);i++)
             {
-                semiColonIndex[semiColonCnt]=i;
-                semiColonCnt++;
-            }
-        }
-
-        uni_cmd->condi_num=semiColonCnt;
-
-        
-        char *name_value=(char *)malloc((ROW_VALUE_SIZE*2)*sizeof(char));
-
-        for(int i=0;i<semiColonCnt;i++)
-        {
-            if(i==0)
-            {
-                strncpy(name_value,&the_pack.condi[0],semiColonIndex[0]-0);
-                name_value[semiColonIndex[0]]='\0';
-            }
-            else
-            {
-                strncpy(name_value,&the_pack.condi[semiColonIndex[i-1]+1],semiColonIndex[i]-(semiColonIndex[i-1]+1));
-                name_value[semiColonIndex[i]-(semiColonIndex[i-1]+1)]='\0';
-            }
-            // 现在 name_value 保存着 name=value
-            char *value_str=(char *)malloc(ROW_VALUE_SIZE*sizeof(char));
-            for(int j=0;j<strlen(name_value);j++)
-            {
-
-                // condi 条件仅限于 < = > ，不支持 <= >=
-                if( name_value[j]=='<'||
-                    name_value[j]=='='||
-                    name_value[j]=='>')
+                if(the_pack.condi[i]==';')
                 {
-                    //value 以 字符串形式保存在 colval[i].value.c_val中，之后由 Admin 进行恢复
-                    strncpy(uni_cmd->condi[i].first,&name_value[0],j-0);
-                    uni_cmd->condi[i].first[j]='\0';
-                    
-                    switch (name_value[j])
-                    {
-                    case '<':
-                        uni_cmd->condi[i].opt=OPT::LESS;
-                        break;
-                    case '=':
-                        uni_cmd->condi[i].opt=OPT::EQUAL;
-                        break;
-                    case '>':
-                        uni_cmd->condi[i].opt=OPT::GREATER;
-                        break;
-                    default:
-                    // 不会跑到default
-                        printf("UNKNOWN ERROR");
-                        break;
-                    }
-
-                    strncpy(value_str,&name_value[j+1],strlen(name_value)-(j+1));
-                    value_str[strlen(name_value)-(j+1)]='\0';
-                    uint8_t value_type=3;
-                    for(int k=0;k<strlen(value_str);k++)
-                    {
-                        if(value_str[i]>='0'&&value_str[i]<='9')
-                            value_type=1;
-                        else if(value_str[i]=='.')
-                            value_type=2;
-                        else
-                        {
-                            value_type=3;
-                            break;
-                        }
-                    }
-                    switch (value_type)
-                    {
-                    case 1:
-                        // int
-                        // uni_cmd->condi-
-                        uni_cmd->condi[i].flags=ATTR::INT;
-                        memset(&uni_cmd->condi[i].second,0,sizeof(val_union));
-                        uni_cmd->condi[i].second.i_val=atoi(value_str);
-                        /* code */
-                        break;
-                    case 2:
-                        // double
-                        uni_cmd->condi[i].flags=ATTR::DOUBLE;
-                        uni_cmd->condi[i].second.d_val=atof(value_str);
-                        break;
-                    case 3:
-                        // string
-                        uni_cmd->condi[i].flags=ATTR::STRING;
-                        strcpy(uni_cmd->condi[i].second.c_val,value_str);
-                        break;
-                    default:
-                        printf("UNKNOWN ERROR\n");
-                        break;
-                    }
-
-
-
+                    semiColonIndex[semiColonCnt]=i;
+                    semiColonCnt++;
                 }
             }
 
+            uni_cmd->condi_num=semiColonCnt;
+
+            
+            char *name_value=(char *)malloc((ROW_VALUE_SIZE*2)*sizeof(char));
+
+            for(int i=0;i<semiColonCnt;i++)
+            {
+                if(i==0)
+                {
+                    strncpy(name_value,&the_pack.condi[0],semiColonIndex[0]-0);
+                    name_value[semiColonIndex[0]]='\0';
+                }
+                else
+                {
+                    strncpy(name_value,&the_pack.condi[semiColonIndex[i-1]+1],semiColonIndex[i]-(semiColonIndex[i-1]+1));
+                    name_value[semiColonIndex[i]-(semiColonIndex[i-1]+1)]='\0';
+                }
+                // 现在 name_value 保存着 name=value
+                char *value_str=(char *)malloc(ROW_VALUE_SIZE*sizeof(char));
+                for(int j=0;j<strlen(name_value);j++)
+                {
+
+                    // condi 条件仅限于 < = > ，不支持 <= >=
+                    if( name_value[j]=='<'||
+                        name_value[j]=='='||
+                        name_value[j]=='>')
+                    {
+                        //value 以 字符串形式保存在 colval[i].value.c_val中，之后由 Admin 进行恢复
+                        strncpy(uni_cmd->condi[i].first,&name_value[0],j-0);
+                        uni_cmd->condi[i].first[j]='\0';
+                        
+                        switch (name_value[j])
+                        {
+                        case '<':
+                            uni_cmd->condi[i].opt=OPT::LESS;
+                            break;
+                        case '=':
+                            uni_cmd->condi[i].opt=OPT::EQUAL;
+                            break;
+                        case '>':
+                            uni_cmd->condi[i].opt=OPT::GREATER;
+                            break;
+                        default:
+                        // 不会跑到default
+                            printf("UNKNOWN ERROR");
+                            break;
+                        }
+
+                        strncpy(value_str,&name_value[j+1],strlen(name_value)-(j+1));
+                        value_str[strlen(name_value)-(j+1)]='\0';
+                        uint8_t value_type=3;
+                        for(int k=0;k<strlen(value_str);k++)
+                        {
+                            if(value_str[i]>='0'&&value_str[i]<='9')
+                                value_type=1;
+                            else if(value_str[i]=='.')
+                                value_type=2;
+                            else
+                            {
+                                value_type=3;
+                                break;
+                            }
+                        }
+                        switch (value_type)
+                        {
+                        case 1:
+                            // int
+                            // uni_cmd->condi-
+                            uni_cmd->condi[i].flags=ATTR::INT;
+                            memset(&uni_cmd->condi[i].second,0,sizeof(val_union));
+                            uni_cmd->condi[i].second.i_val=atoi(value_str);
+                            /* code */
+                            break;
+                        case 2:
+                            // double
+                            uni_cmd->condi[i].flags=ATTR::DOUBLE;
+                            uni_cmd->condi[i].second.d_val=atof(value_str);
+                            break;
+                        case 3:
+                            // string
+                            uni_cmd->condi[i].flags=ATTR::STRING;
+                            strcpy(uni_cmd->condi[i].second.c_val,value_str);
+                            break;
+                        default:
+                            printf("UNKNOWN ERROR\n");
+                            break;
+                        }
+
+
+
+                    }
+                }
+
+            }
+
+
+
+
         }
 
-
-
-
-
-
-
+        
     }
     else if(!strcmp(the_pack.act,"session_on"))
     {
