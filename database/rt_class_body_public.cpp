@@ -165,33 +165,33 @@ int DBMGR::CreateTable(char * tbname,CreateAttr *attr){
     }
 
 
-    int col_primary=-1;
-    for(int i=0;i<this->data_tb.col_num;i++)
-    {
-        //zero for false, non-zero for true
-        if((this->data_tb.col_itm[i].flags&ATTR::PRIMARY))
-            if(col_primary!=-1)
-                pError("Too Many Primary Key");
-            else
-                col_primary=i;
-    }
+    // int col_primary=-1;
+    // for(int i=0;i<this->data_tb.col_num;i++)
+    // {
+    //     //zero for false, non-zero for true
+    //     if((this->data_tb.col_itm[i].flags&ATTR::PRIMARY))
+    //         if(col_primary!=-1)
+    //             pError("Too Many Primary Key");
+    //         else
+    //             col_primary=i;
+    // }
     
-    if(col_primary!=-1)
-    {
-        index_item idx_itm;
-        InitIndex(col_primary,&idx_itm);
-        memcpy(&fst_index_storage,&idx_itm,sizeof(idx_itm));
-        strcpy(this->idx_tb.item_info[this->idx_tb.item_count].column_name,
-            this->data_tb.col_itm[col_primary].col_name);
-        this->idx_tb.item_info[this->idx_tb.item_count].offset
-            =this->idx_tb.storage_table[this->idx_tb.storage_num-1].cur_offset;
-        this->idx_tb.storage_table[this->idx_tb.storage_num-1].cur_offset
-            +=sizeof(idx_itm);
+    // if(col_primary!=-1)
+    // {
+    //     index_item idx_itm;
+    //     InitIndex(col_primary,&idx_itm);
+    //     memcpy(&fst_index_storage,&idx_itm,sizeof(idx_itm));
+    //     strcpy(this->idx_tb.item_info[this->idx_tb.item_count].column_name,
+    //         this->data_tb.col_itm[col_primary].col_name);
+    //     this->idx_tb.item_info[this->idx_tb.item_count].offset
+    //         =this->idx_tb.storage_table[this->idx_tb.storage_num-1].cur_offset;
+    //     this->idx_tb.storage_table[this->idx_tb.storage_num-1].cur_offset
+    //         +=sizeof(idx_itm);
         
-        //建立了索引表
-        this->idx_tb_info.clause_num++;
-        this->idx_tb.item_count++;
-    }
+    //     //建立了索引表
+    //     this->idx_tb_info.clause_num++;
+    //     this->idx_tb.item_count++;
+    // }
 
     
     this->db_header.table_num++;
@@ -400,449 +400,453 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
         index_item idx_itm;
         //用于更新索引后写回
         off_t idx_itm_offset;
-        while(true)
-        {
+        // while(true)
+        // {
 
-            if(workptr->opt==NEQUAL||workptr->opt==EQUAL)
-            {
-                // 遍历 idx_tb.item_info
-                for(int i=0;i<this->idx_tb.item_count;i++)
-                {
-                    // 找到第一个索引列
-                    if(!strcmp(this->idx_tb.item_info[i].column_name,workptr->first))
-                    {
-                        found_value2data_table=true;
-                        if(lseek(this->fd,this->idx_tb.item_info[i].offset,SEEK_SET)==-1)
-                            pError();
-                        if(read(this->fd,&idx_itm,sizeof(idx_itm))==-1)
-                            pError();
-                        break;
-                    }
-                }
-            }
+        //     if(workptr->opt==NEQUAL||workptr->opt==EQUAL)
+        //     {
+        //         // 遍历 idx_tb.item_info
+        //         for(int i=0;i<this->idx_tb.item_count;i++)
+        //         {
+        //             // 找到第一个索引列
+        //             if(!strcmp(this->idx_tb.item_info[i].column_name,workptr->first))
+        //             {
+        //                 found_value2data_table=true;
+        //                 if(lseek(this->fd,this->idx_tb.item_info[i].offset,SEEK_SET)==-1)
+        //                     pError();
+        //                 if(read(this->fd,&idx_itm,sizeof(idx_itm))==-1)
+        //                     pError();
+        //                 break;
+        //             }
+        //         }
+        //     }
             
-            if(found_value2data_table)
-                break;
-            else if(workptr->next==NULL)
-                break;
-            else
-                workptr=workptr->next;
-        }
+        //     if(found_value2data_table)
+        //         break;
+        //     else if(workptr->next==NULL)
+        //         break;
+        //     else
+        //         workptr=workptr->next;
+        // }
         
 
 
-        // 获取索引成功 当前索引树保存在 idx_itm ， 索引 value 在 workptr->second
-        if(found_value2data_table)
+        // // 获取索引成功 当前索引树保存在 idx_itm ， 索引 value 在 workptr->second
+        // if(found_value2data_table)
+        // {
+        //     // 将 value2data_table 中匹配的偏移量保存到 offset_after_index 中
+        //     std::stack<off_t> offset_after_index;
+            
+        //     value2data_table matched_table=this->LocateWithIndex(idx_itm,workptr->second);
+        //     for(int i=0;i<matched_table.count;i++)
+        //     {
+        //         if(!memcmp(&matched_table.value2data[i].value,&workptr->second,sizeof(val_union)))
+        //         {
+        //             offset_after_index.push(matched_table.value2data[i].offset);
+        //         }
+        //     }
+        //     // 找到若干匹配项，其偏移量保存在 offset_after_index 中
+        //     if(offset_after_index.size()!=0)
+        //     {
+            
+        //         while(!offset_after_index.empty())
+        //         {
+        //             int condi_depth_cnt=0;
+        //             int condi_match_cnt=0;
+        //             //将其读入row_itm
+        //             if(lseek(this->fd,offset_after_index.top(),SEEK_SET)==-1)
+        //                 pError();
+        //             if(read(this->fd,row_itm,sizeof(row_itm))==-1)
+        //                 pError();
+                    
+
+        //             // 遍历 col_item[]
+        //             for(int i=0;i<this->data_tb.col_num;i++)
+        //             {
+        //                 workptr=condi;
+        //                 // 遍历 condi 链表
+        //                 while(true)
+        //                 {
+        //                     condi_depth_cnt++;
+        //                     // 如果 当前 workptr 指向的列数据 与 col_item[i] 匹配
+        //                     if(!strcmp(this->data_tb.col_itm[i].col_name,workptr->first))
+        //                     {
+        //                         if((this->data_tb.col_itm[i].flags&ATTR::INT)==ATTR::INT)
+        //                         {
+        //                             switch (workptr->opt){
+        //                                 case NEQUAL:{
+        //                                     if(workptr->second.i_val!=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LESS:{
+        //                                     if(workptr->second.i_val<row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LEQUAL:{
+        //                                     if(workptr->second.i_val<=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case EQUAL:{
+        //                                     if(workptr->second.i_val==row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GEUQAL:{
+        //                                     if(workptr->second.i_val>=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GREATER:{
+        //                                     if(workptr->second.i_val>row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 default:{
+        //                                     pError("Invalid Operator");
+        //                                 }
+        //                             }
+        //                         }
+        //                         else if((this->data_tb.col_itm[i].flags&ATTR::DOUBLE)==ATTR::DOUBLE){
+        //                             switch (workptr->opt){
+        //                                 case NEQUAL:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LESS:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+        //                                     row_itm[i].value.d_val-workptr->second.d_val>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LEQUAL:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+        //                                     row_itm[i].value.d_val-workptr->second.d_val>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case EQUAL:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GEUQAL:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+        //                                     workptr->second.d_val-row_itm[i].value.d_val>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GREATER:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+        //                                     workptr->second.d_val-row_itm[i].value.d_val>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 default:{
+        //                                     pError("Invalid Operator");
+        //                                 }
+        //                             }
+        //                         }
+        //                         else if((this->data_tb.col_itm[i].flags&ATTR::STRING)==ATTR::STRING){
+        //                             switch (workptr->opt){
+        //                                 case NEQUAL:{
+        //                                     if(strcmp(workptr->second.c_val,row_itm[i].value.c_val))
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case EQUAL:{
+        //                                     if(!strcmp(workptr->second.c_val,row_itm[i].value.c_val))
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 default:{
+        //                                     pError("Invalid Operator");
+        //                                 }
+        //                             }
+        //                         }
+        //                         else if((this->data_tb.col_itm[i].flags&ATTR::TIME)==ATTR::TIME){
+        //                             switch (workptr->opt){
+        //                                 case NEQUAL:{
+        //                                     if(workptr->second.i_val!=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LESS:{
+        //                                     if(workptr->second.i_val<row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LEQUAL:{
+        //                                     if(workptr->second.i_val<=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case EQUAL:{
+        //                                     if(workptr->second.i_val==row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GEUQAL:{
+        //                                     if(workptr->second.i_val>=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GREATER:{
+        //                                     if(workptr->second.i_val>row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 default:{
+        //                                     pError("Invalid Operator");
+        //                                 }
+        //                             }
+        //                         }
+        //                     }
+        //                     if(workptr->next==NULL)
+        //                         break;
+        //                     else
+        //                         workptr=workptr->next;
+        //                 }
+        //                 if(condi_depth_cnt!=condi_match_cnt)
+        //                     break;
+        //             }
+        //             // 如果condi depth cnt 为 0， 则说明DBFile出错
+        //             if(condi_depth_cnt==0)
+        //                 pError("Table Broken");
+        //             else if(condi_depth_cnt==condi_match_cnt)
+        //                 offset_final.push(offset_after_index.top());
+
+        //             offset_after_index.pop();
+        //         }
+        //     }
+        //     else
+        //     {
+        //         //未找到匹配项，进行逐行扫描
+        //         off_t cur_offset=this->data_tb.storage_table[0].offset;
+        //         for(int i=0;i<this->data_tb.col_num;i++)
+        //         {
+        //             int condi_depth_cnt=0;
+        //             int condi_match_cnt=0;
+                    
+                    
+        //             // 读取一行数据到row_itm
+        //             if(lseek(this->fd,cur_offset,SEEK_SET)==-1)
+        //                 pError();
+        //             if(read(this->fd,row_itm,sizeof(row_itm))==-1)
+        //                 pError();
+                    
+        //             // 遍历 col_item[]
+        //             for(int i=0;i<this->data_tb.col_num;i++)
+        //             {
+        //                 workptr=condi;
+        //                 // 遍历 condi 链表
+        //                 while(true)
+        //                 {
+        //                     condi_depth_cnt++;
+        //                     // 如果 当前 workptr 指向的列数据 与 col_item[i] 匹配
+        //                     if(!strcmp(this->data_tb.col_itm[i].col_name,workptr->first))
+        //                     {
+        //                         if((this->data_tb.col_itm[i].flags&ATTR::INT)==ATTR::INT)
+        //                         {
+        //                             switch (workptr->opt){
+        //                                 case NEQUAL:{
+        //                                     if(workptr->second.i_val!=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LESS:{
+        //                                     if(workptr->second.i_val<row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LEQUAL:{
+        //                                     if(workptr->second.i_val<=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case EQUAL:{
+        //                                     if(workptr->second.i_val==row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GEUQAL:{
+        //                                     if(workptr->second.i_val>=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GREATER:{
+        //                                     if(workptr->second.i_val>row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 default:{
+        //                                     pError("Invalid Operator");
+        //                                 }
+        //                             }
+        //                         }
+        //                         else if((this->data_tb.col_itm[i].flags&ATTR::DOUBLE)==ATTR::DOUBLE){
+        //                             switch (workptr->opt){
+        //                                 case NEQUAL:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LESS:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+        //                                     row_itm[i].value.d_val-workptr->second.d_val>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LEQUAL:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+        //                                     row_itm[i].value.d_val-workptr->second.d_val>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case EQUAL:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GEUQAL:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+        //                                     workptr->second.d_val-row_itm[i].value.d_val>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GREATER:{
+        //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+        //                                     workptr->second.d_val-row_itm[i].value.d_val>EPS)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 default:{
+        //                                     pError("Invalid Operator");
+        //                                 }
+        //                             }
+        //                         }
+        //                         else if((this->data_tb.col_itm[i].flags&ATTR::STRING)==ATTR::STRING){
+        //                             switch (workptr->opt){
+        //                                 case NEQUAL:{
+        //                                     if(strcmp(workptr->second.c_val,row_itm[i].value.c_val))
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case EQUAL:{
+        //                                     if(!strcmp(workptr->second.c_val,row_itm[i].value.c_val))
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 default:{
+        //                                     pError("Invalid Operator");
+        //                                 }
+        //                             }
+        //                         }
+        //                         else if((this->data_tb.col_itm[i].flags&ATTR::TIME)==ATTR::TIME){
+        //                             switch (workptr->opt){
+        //                                 case NEQUAL:{
+        //                                     if(workptr->second.i_val!=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LESS:{
+        //                                     if(workptr->second.i_val<row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case LEQUAL:{
+        //                                     if(workptr->second.i_val<=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case EQUAL:{
+        //                                     if(workptr->second.i_val==row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GEUQAL:{
+        //                                     if(workptr->second.i_val>=row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 case GREATER:{
+        //                                     if(workptr->second.i_val>row_itm[i].value.i_val)
+        //                                         condi_match_cnt++;
+                                            
+        //                                     break;
+        //                                 }
+        //                                 default:{
+        //                                     pError("Invalid Operator");
+        //                                 }
+        //                             }
+        //                         }
+        //                     }
+        //                     if(workptr==NULL)
+        //                         break;
+        //                 }
+        //                 if(condi_depth_cnt!=condi_match_cnt)
+        //                     break;
+        //             }
+        //             // 如果condi depth cnt 为 0， 则说明DBFile出错
+        //             if(condi_depth_cnt==0)
+        //                 pError("Table Broken");
+        //             else if(condi_depth_cnt==condi_match_cnt)
+        //                 offset_final.push(cur_offset);
+
+        //             // 更新 cur_offset 值
+        //             cur_offset+=sizeof(row_itm);
+                    
+        //         }
+        //     }
+
+        // }
+        // else
+        
+        
+        
         {
-            // 将 value2data_table 中匹配的偏移量保存到 offset_after_index 中
-            std::stack<off_t> offset_after_index;
-            
-            value2data_table matched_table=this->LocateWithIndex(idx_itm,workptr->second);
-            for(int i=0;i<matched_table.count;i++)
-            {
-                if(!memcmp(&matched_table.value2data[i].value,&workptr->second,sizeof(val_union)))
-                {
-                    offset_after_index.push(matched_table.value2data[i].offset);
-                }
-            }
-            // 找到若干匹配项，其偏移量保存在 offset_after_index 中
-            if(offset_after_index.size()!=0)
-            {
-            
-                while(!offset_after_index.empty())
-                {
-                    int condi_depth_cnt=0;
-                    int condi_match_cnt=0;
-                    //将其读入row_itm
-                    if(lseek(this->fd,offset_after_index.top(),SEEK_SET)==-1)
-                        pError();
-                    if(read(this->fd,row_itm,sizeof(row_itm))==-1)
-                        pError();
-                    
-
-                    // 遍历 col_item[]
-                    for(int i=0;i<this->data_tb.col_num;i++)
-                    {
-                        workptr=condi;
-                        // 遍历 condi 链表
-                        while(true)
-                        {
-                            condi_depth_cnt++;
-                            // 如果 当前 workptr 指向的列数据 与 col_item[i] 匹配
-                            if(!strcmp(this->data_tb.col_itm[i].col_name,workptr->first))
-                            {
-                                if((this->data_tb.col_itm[i].flags&ATTR::INT)==ATTR::INT)
-                                {
-                                    switch (workptr->opt){
-                                        case NEQUAL:{
-                                            if(workptr->second.i_val!=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LESS:{
-                                            if(workptr->second.i_val<row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LEQUAL:{
-                                            if(workptr->second.i_val<=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case EQUAL:{
-                                            if(workptr->second.i_val==row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GEUQAL:{
-                                            if(workptr->second.i_val>=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GREATER:{
-                                            if(workptr->second.i_val>row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        default:{
-                                            pError("Invalid Operator");
-                                        }
-                                    }
-                                }
-                                else if((this->data_tb.col_itm[i].flags&ATTR::DOUBLE)==ATTR::DOUBLE){
-                                    switch (workptr->opt){
-                                        case NEQUAL:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LESS:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                            row_itm[i].value.d_val-workptr->second.d_val>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LEQUAL:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                            row_itm[i].value.d_val-workptr->second.d_val>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case EQUAL:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GEUQAL:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                            workptr->second.d_val-row_itm[i].value.d_val>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GREATER:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                            workptr->second.d_val-row_itm[i].value.d_val>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        default:{
-                                            pError("Invalid Operator");
-                                        }
-                                    }
-                                }
-                                else if((this->data_tb.col_itm[i].flags&ATTR::STRING)==ATTR::STRING){
-                                    switch (workptr->opt){
-                                        case NEQUAL:{
-                                            if(strcmp(workptr->second.c_val,row_itm[i].value.c_val))
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case EQUAL:{
-                                            if(!strcmp(workptr->second.c_val,row_itm[i].value.c_val))
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        default:{
-                                            pError("Invalid Operator");
-                                        }
-                                    }
-                                }
-                                else if((this->data_tb.col_itm[i].flags&ATTR::TIME)==ATTR::TIME){
-                                    switch (workptr->opt){
-                                        case NEQUAL:{
-                                            if(workptr->second.i_val!=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LESS:{
-                                            if(workptr->second.i_val<row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LEQUAL:{
-                                            if(workptr->second.i_val<=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case EQUAL:{
-                                            if(workptr->second.i_val==row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GEUQAL:{
-                                            if(workptr->second.i_val>=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GREATER:{
-                                            if(workptr->second.i_val>row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        default:{
-                                            pError("Invalid Operator");
-                                        }
-                                    }
-                                }
-                            }
-                            if(workptr->next==NULL)
-                                break;
-                            else
-                                workptr=workptr->next;
-                        }
-                        if(condi_depth_cnt!=condi_match_cnt)
-                            break;
-                    }
-                    // 如果condi depth cnt 为 0， 则说明DBFile出错
-                    if(condi_depth_cnt==0)
-                        pError("Table Broken");
-                    else if(condi_depth_cnt==condi_match_cnt)
-                        offset_final.push(offset_after_index.top());
-
-                    offset_after_index.pop();
-                }
-            }
-            else
-            {
-                //未找到匹配项，进行逐行扫描
-                off_t cur_offset=this->data_tb.storage_table[0].offset;
-                for(int i=0;i<this->data_tb.col_num;i++)
-                {
-                    int condi_depth_cnt=0;
-                    int condi_match_cnt=0;
-                    
-                    
-                    // 读取一行数据到row_itm
-                    if(lseek(this->fd,cur_offset,SEEK_SET)==-1)
-                        pError();
-                    if(read(this->fd,row_itm,sizeof(row_itm))==-1)
-                        pError();
-                    
-                    // 遍历 col_item[]
-                    for(int i=0;i<this->data_tb.col_num;i++)
-                    {
-                        workptr=condi;
-                        // 遍历 condi 链表
-                        while(true)
-                        {
-                            condi_depth_cnt++;
-                            // 如果 当前 workptr 指向的列数据 与 col_item[i] 匹配
-                            if(!strcmp(this->data_tb.col_itm[i].col_name,workptr->first))
-                            {
-                                if((this->data_tb.col_itm[i].flags&ATTR::INT)==ATTR::INT)
-                                {
-                                    switch (workptr->opt){
-                                        case NEQUAL:{
-                                            if(workptr->second.i_val!=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LESS:{
-                                            if(workptr->second.i_val<row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LEQUAL:{
-                                            if(workptr->second.i_val<=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case EQUAL:{
-                                            if(workptr->second.i_val==row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GEUQAL:{
-                                            if(workptr->second.i_val>=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GREATER:{
-                                            if(workptr->second.i_val>row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        default:{
-                                            pError("Invalid Operator");
-                                        }
-                                    }
-                                }
-                                else if((this->data_tb.col_itm[i].flags&ATTR::DOUBLE)==ATTR::DOUBLE){
-                                    switch (workptr->opt){
-                                        case NEQUAL:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LESS:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                            row_itm[i].value.d_val-workptr->second.d_val>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LEQUAL:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                            row_itm[i].value.d_val-workptr->second.d_val>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case EQUAL:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GEUQAL:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                            workptr->second.d_val-row_itm[i].value.d_val>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GREATER:{
-                                            if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                            workptr->second.d_val-row_itm[i].value.d_val>EPS)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        default:{
-                                            pError("Invalid Operator");
-                                        }
-                                    }
-                                }
-                                else if((this->data_tb.col_itm[i].flags&ATTR::STRING)==ATTR::STRING){
-                                    switch (workptr->opt){
-                                        case NEQUAL:{
-                                            if(strcmp(workptr->second.c_val,row_itm[i].value.c_val))
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case EQUAL:{
-                                            if(!strcmp(workptr->second.c_val,row_itm[i].value.c_val))
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        default:{
-                                            pError("Invalid Operator");
-                                        }
-                                    }
-                                }
-                                else if((this->data_tb.col_itm[i].flags&ATTR::TIME)==ATTR::TIME){
-                                    switch (workptr->opt){
-                                        case NEQUAL:{
-                                            if(workptr->second.i_val!=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LESS:{
-                                            if(workptr->second.i_val<row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case LEQUAL:{
-                                            if(workptr->second.i_val<=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case EQUAL:{
-                                            if(workptr->second.i_val==row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GEUQAL:{
-                                            if(workptr->second.i_val>=row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        case GREATER:{
-                                            if(workptr->second.i_val>row_itm[i].value.i_val)
-                                                condi_match_cnt++;
-                                            
-                                            break;
-                                        }
-                                        default:{
-                                            pError("Invalid Operator");
-                                        }
-                                    }
-                                }
-                            }
-                            if(workptr==NULL)
-                                break;
-                        }
-                        if(condi_depth_cnt!=condi_match_cnt)
-                            break;
-                    }
-                    // 如果condi depth cnt 为 0， 则说明DBFile出错
-                    if(condi_depth_cnt==0)
-                        pError("Table Broken");
-                    else if(condi_depth_cnt==condi_match_cnt)
-                        offset_final.push(cur_offset);
-
-                    // 更新 cur_offset 值
-                    cur_offset+=sizeof(row_itm);
-                    
-                }
-            }
-
-        }
-        else{
         // 获取索引失败，则逐行扫描
             off_t cur_offset=this->data_tb.storage_table[0].offset;
             for(int i=0;i<this->data_tb.col_num;i++)
@@ -1079,8 +1083,8 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
     {
         while(true)
         {
-            sprintf(str_swapper,"%s    ",workcolptr->name);
-            string_swapper.append(str_swapper);
+            // sprintf(str_swapper,"%s    ",workcolptr->name);
+            // string_swapper.append(str_swapper);
             
             for(int i=0;i<this->data_tb.col_num;i++)
             {
@@ -1093,7 +1097,7 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
 
             if(workcolptr->next==NULL)
             {
-                string_swapper.append("\n");
+                // string_swapper.append("\n");
                 break;
             }
             else{
@@ -1105,13 +1109,18 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
         // 如果workcolptr是 NULL，则返回所有的列
         for(int i=0;i<this->data_tb.col_num;i++)
         {
-            sprintf(str_swapper,"%s    ",this->data_tb.col_itm[i].col_name);
-            string_swapper.append(str_swapper);
+            // sprintf(str_swapper,"%s    ",this->data_tb.col_itm[i].col_name);
+            // string_swapper.append(str_swapper);
             col_idx.push(i);
         }
-        string_swapper.append("\n");
+        // string_swapper.append("\n");
+
+        
+        // 返回 json 格式
+        
+
     }
-    
+    string_swapper.append("{\n  \"res\":[\n");
     
     // row_item row_itm[this->data_tb.col_num];
 
@@ -1133,29 +1142,59 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
 
         offset_final.pop();
 
+        string_swapper.append("        {\n");
+
         while(!col_idx_copy.empty())
         {
             if((row_itm[col_idx_copy.front()].flags&ATTR::INT)==ATTR::INT)
             {
-                sprintf(str_swapper,"%d    ",row_itm[col_idx_copy.front()].value.i_val);
+                sprintf(str_swapper,"            \"%s\":%d",
+                    this->data_tb.col_itm[col_idx_copy.front()].col_name,
+                    row_itm[col_idx_copy.front()].value.i_val);
                 string_swapper.append(str_swapper);
             }
             else if((row_itm[col_idx_copy.front()].flags&ATTR::DOUBLE)==ATTR::DOUBLE){
-                sprintf(str_swapper,"%f    ",row_itm[col_idx_copy.front()].value.d_val);
+                sprintf(str_swapper,"            \"%s\":%f",
+                    this->data_tb.col_itm[col_idx_copy.front()].col_name,
+                    row_itm[col_idx_copy.front()].value.d_val);
                 string_swapper.append(str_swapper);
             }
             else if((row_itm[col_idx_copy.front()].flags&ATTR::STRING)==ATTR::STRING){
-                sprintf(str_swapper,"%s    ",row_itm[col_idx_copy.front()].value.c_val);
+                sprintf(str_swapper,"            \"%s\":%s",
+                    this->data_tb.col_itm[col_idx_copy.front()].col_name,
+                    row_itm[col_idx_copy.front()].value.c_val);
                 string_swapper.append(str_swapper);
             }
             else if((row_itm[col_idx_copy.front()].flags&ATTR::TIME)==ATTR::TIME){
-                sprintf(str_swapper,"%d    ",row_itm[col_idx_copy.front()].value.t_val);
+                sprintf(str_swapper,"            \"%s\":%d",
+                    this->data_tb.col_itm[col_idx_copy.front()].col_name,
+                    row_itm[col_idx_copy.front()].value.t_val);
                 string_swapper.append(str_swapper);
             }
             col_idx_copy.pop();
+            if(!col_idx_copy.empty())
+            {
+                string_swapper.append(",\n");
+            }
+            else{
+                string_swapper.append("\n        }");
+            }
+
+
+
         }
-        string_swapper.append("\n");
+
+        if(!offset_final.empty())
+        {
+            string_swapper.append(",\n");
+        }
+        else{
+            string_swapper.append("\n");
+        }
+
     }
+
+    string_swapper.append("    ]\n}");
 
     strcpy(str_swapper,string_swapper.c_str());
 
@@ -1296,38 +1335,38 @@ int DBMGR::Update(char * tbname,char *colname,val_union colvalue,UpdataCondi *co
     // 遍历condi，尝试获取 idx_item 注意：本索引由于是根据 value 的 hash 值 建立的
     // 所以仅针对 NEQUAL EQUAL 有效
     UpdataCondi *workptr=condi;
-    bool found_value2data_table=false;
+    // bool found_value2data_table=false;
     index_item idx_itm;
     //用于更新索引后写回
-    off_t idx_itm_offset;
-    while(true)
-    {
-        if(workptr->opt==NEQUAL||workptr->opt==EQUAL)
-        {
-            // 遍历 idx_tb.item_info
-            for(int i=0;i<this->idx_tb.item_count;i++)
-            {
-                // 找到第一个索引列
-                if(!strcmp(this->idx_tb.item_info[i].column_name,workptr->first))
-                {
-                    found_value2data_table=true;
-                    if(lseek(this->fd,this->idx_tb.item_info[i].offset,SEEK_SET)==-1)
-                        pError();
-                    if(read(this->fd,&idx_itm,sizeof(idx_itm))==-1)
-                        pError();
-                    idx_itm_offset=this->idx_tb.item_info[i].offset;
-                    break;
-                }
-            }
-        }
+    // off_t idx_itm_offset;
+    // while(true)
+    // {
+    //     if(workptr->opt==NEQUAL||workptr->opt==EQUAL)
+    //     {
+    //         // 遍历 idx_tb.item_info
+    //         for(int i=0;i<this->idx_tb.item_count;i++)
+    //         {
+    //             // 找到第一个索引列
+    //             if(!strcmp(this->idx_tb.item_info[i].column_name,workptr->first))
+    //             {
+    //                 found_value2data_table=true;
+    //                 if(lseek(this->fd,this->idx_tb.item_info[i].offset,SEEK_SET)==-1)
+    //                     pError();
+    //                 if(read(this->fd,&idx_itm,sizeof(idx_itm))==-1)
+    //                     pError();
+    //                 idx_itm_offset=this->idx_tb.item_info[i].offset;
+    //                 break;
+    //             }
+    //         }
+    //     }
         
-        if(found_value2data_table)
-            break;
-        else if(workptr->next==NULL)
-            break;
-        else
-            workptr=workptr->next;
-    }
+    //     if(found_value2data_table)
+    //         break;
+    //     else if(workptr->next==NULL)
+    //         break;
+    //     else
+    //         workptr=workptr->next;
+    // }
     
 
     // 最终完全匹配的偏移量
@@ -1336,223 +1375,203 @@ int DBMGR::Update(char * tbname,char *colname,val_union colvalue,UpdataCondi *co
     row_item row_itm[this->data_tb.col_num];
 
     // 获取索引成功 当前索引树保存在 idx_itm ， 索引 value 在 workptr->second
-    if(found_value2data_table)
+    // if(found_value2data_table)
+    // {
+    //     // 将 value2data_table 中匹配的偏移量保存到 offset_after_index 中
+    //     std::stack<off_t> offset_after_index;      
+    //     value2data_table matched_table=this->LocateWithIndex(idx_itm,workptr->second);
+    //     for(int i=0;i<matched_table.count;i++)
+    //     {
+    //         if(!memcmp(&matched_table.value2data[i].value,&workptr->second,sizeof(val_union)))
+    //         {
+    //             offset_after_index.push(matched_table.value2data[i].offset);
+    //         }
+    //     }
+    //     // 未找到匹配项
+    //     if(offset_after_index.size()==0)
+    //         changed_count=0;
+    //     else{
+    //     // 找到若干匹配项，其偏移量保存在 offset_after_index 中
+    //         while(!offset_after_index.empty())
+    //         {
+    //             int condi_depth_cnt=0;
+    //             int condi_match_cnt=0;
+    //             //将其读入row_itm
+    //             if(lseek(this->fd,offset_after_index.top(),SEEK_SET)==-1)
+    //                 pError();
+    //             if(read(this->fd,row_itm,sizeof(row_itm))==-1)
+    //                 pError();
+    //             // 遍历 col_item[]
+    //             for(int i=0;i<this->data_tb.col_num;i++)
+    //             {
+    //                 workptr=condi;
+    //                 // 遍历 condi 链表
+    //                 while(true)
+    //                 {
+    //                     condi_depth_cnt++;
+    //                     // 如果 当前 workptr 指向的列数据 与 col_item[i] 匹配
+    //                     if(!strcmp(this->data_tb.col_itm[i].col_name,workptr->first))
+    //                     {
+    //                         if((this->data_tb.col_itm[i].flags&ATTR::INT)==ATTR::INT)
+    //                         {
+    //                             switch (workptr->opt){
+    //                                 case NEQUAL:{
+    //                                     if(workptr->second.i_val!=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;                                   
+    //                                     break;
+    //                                 }
+    //                                 case LESS:{
+    //                                     if(workptr->second.i_val<row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;                              
+    //                                     break;
+    //                                 }
+    //                                 case LEQUAL:{
+    //                                     if(workptr->second.i_val<=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;                                
+    //                                     break;
+    //                                 }
+    //                                 case EQUAL:{
+    //                                     if(workptr->second.i_val==row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;         
+    //                                     break;
+    //                                 }
+    //                                 case GEUQAL:{
+    //                                     if(workptr->second.i_val>=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GREATER:{
+    //                                     if(workptr->second.i_val>row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 default:{
+    //                                     pError("Invalid Operator");
+    //                                 }
+    //                             }
+    //                         }
+    //                         else if((this->data_tb.col_itm[i].flags&ATTR::DOUBLE)==ATTR::DOUBLE){
+    //                             switch (workptr->opt){
+    //                                 case NEQUAL:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)>EPS)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LESS:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+    //                                     row_itm[i].value.d_val-workptr->second.d_val>EPS)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LEQUAL:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+    //                                     row_itm[i].value.d_val-workptr->second.d_val>EPS)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case EQUAL:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GEUQAL:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+    //                                     workptr->second.d_val-row_itm[i].value.d_val>EPS)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GREATER:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+    //                                     workptr->second.d_val-row_itm[i].value.d_val>EPS)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 default:{
+    //                                     pError("Invalid Operator");
+    //                                 }
+    //                             }
+    //                         }
+    //                         else if((this->data_tb.col_itm[i].flags&ATTR::STRING)==ATTR::STRING){
+    //                             switch (workptr->opt){
+    //                                 case NEQUAL:{
+    //                                     if(strcmp(workptr->second.c_val,row_itm[i].value.c_val))
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case EQUAL:{
+    //                                     if(!strcmp(workptr->second.c_val,row_itm[i].value.c_val))
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 default:{
+    //                                     pError("Invalid Operator");
+    //                                 }
+    //                             }
+    //                         }
+    //                         else if((this->data_tb.col_itm[i].flags&ATTR::TIME)==ATTR::TIME){
+    //                             switch (workptr->opt){
+    //                                 case NEQUAL:{
+    //                                     if(workptr->second.i_val!=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LESS:{
+    //                                     if(workptr->second.i_val<row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LEQUAL:{
+    //                                     if(workptr->second.i_val<=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case EQUAL:{
+    //                                     if(workptr->second.i_val==row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GEUQAL:{
+    //                                     if(workptr->second.i_val>=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GREATER:{
+    //                                     if(workptr->second.i_val>row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 default:{
+    //                                     pError("Invalid Operator");
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                     if(workptr->next==NULL)
+    //                         break;
+    //                     else
+    //                         workptr=workptr->next;
+    //                 }
+    //                 if(condi_depth_cnt!=condi_match_cnt)
+    //                     break;
+    //             }
+    //             // 如果condi depth cnt 为 0， 则说明DBFile出错
+    //             if(condi_depth_cnt==0)
+    //                 pError("Table Broken");
+    //             else if(condi_depth_cnt==condi_match_cnt)
+    //                 offset_final.push(offset_after_index.top());
+    //             offset_after_index.pop();
+    //         }
+    //     }
+    // }
+    // else
+    
     {
-        // 将 value2data_table 中匹配的偏移量保存到 offset_after_index 中
-        std::stack<off_t> offset_after_index;
-        
-        value2data_table matched_table=this->LocateWithIndex(idx_itm,workptr->second);
-        for(int i=0;i<matched_table.count;i++)
-        {
-            if(!memcmp(&matched_table.value2data[i].value,&workptr->second,sizeof(val_union)))
-            {
-                offset_after_index.push(matched_table.value2data[i].offset);
-            }
-        }
-        // 未找到匹配项
-        if(offset_after_index.size()==0)
-            changed_count=0;
-        else{
-        // 找到若干匹配项，其偏移量保存在 offset_after_index 中
-            while(!offset_after_index.empty())
-            {
-                int condi_depth_cnt=0;
-                int condi_match_cnt=0;
-                //将其读入row_itm
-                if(lseek(this->fd,offset_after_index.top(),SEEK_SET)==-1)
-                    pError();
-                if(read(this->fd,row_itm,sizeof(row_itm))==-1)
-                    pError();
-                
-
-                // 遍历 col_item[]
-                for(int i=0;i<this->data_tb.col_num;i++)
-                {
-                    workptr=condi;
-                    // 遍历 condi 链表
-                    while(true)
-                    {
-                        condi_depth_cnt++;
-                        // 如果 当前 workptr 指向的列数据 与 col_item[i] 匹配
-                        if(!strcmp(this->data_tb.col_itm[i].col_name,workptr->first))
-                        {
-                            if((this->data_tb.col_itm[i].flags&ATTR::INT)==ATTR::INT)
-                            {
-                                switch (workptr->opt){
-                                    case NEQUAL:{
-                                        if(workptr->second.i_val!=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case LESS:{
-                                        if(workptr->second.i_val<row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case LEQUAL:{
-                                        if(workptr->second.i_val<=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case EQUAL:{
-                                        if(workptr->second.i_val==row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case GEUQAL:{
-                                        if(workptr->second.i_val>=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case GREATER:{
-                                        if(workptr->second.i_val>row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    default:{
-                                        pError("Invalid Operator");
-                                    }
-                                }
-                            }
-                            else if((this->data_tb.col_itm[i].flags&ATTR::DOUBLE)==ATTR::DOUBLE){
-                                switch (workptr->opt){
-                                    case NEQUAL:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)>EPS)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case LESS:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                        row_itm[i].value.d_val-workptr->second.d_val>EPS)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case LEQUAL:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                        row_itm[i].value.d_val-workptr->second.d_val>EPS)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case EQUAL:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case GEUQAL:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                        workptr->second.d_val-row_itm[i].value.d_val>EPS)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case GREATER:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                        workptr->second.d_val-row_itm[i].value.d_val>EPS)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    default:{
-                                        pError("Invalid Operator");
-                                    }
-                                }
-                            }
-                            else if((this->data_tb.col_itm[i].flags&ATTR::STRING)==ATTR::STRING){
-                                switch (workptr->opt){
-                                    case NEQUAL:{
-                                        if(strcmp(workptr->second.c_val,row_itm[i].value.c_val))
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case EQUAL:{
-                                        if(!strcmp(workptr->second.c_val,row_itm[i].value.c_val))
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    default:{
-                                        pError("Invalid Operator");
-                                    }
-                                }
-                            }
-                            else if((this->data_tb.col_itm[i].flags&ATTR::TIME)==ATTR::TIME){
-                                switch (workptr->opt){
-                                    case NEQUAL:{
-                                        if(workptr->second.i_val!=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case LESS:{
-                                        if(workptr->second.i_val<row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case LEQUAL:{
-                                        if(workptr->second.i_val<=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case EQUAL:{
-                                        if(workptr->second.i_val==row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case GEUQAL:{
-                                        if(workptr->second.i_val>=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    case GREATER:{
-                                        if(workptr->second.i_val>row_itm[i].value.i_val)
-                                            condi_match_cnt++;
-                                        
-                                        break;
-                                    }
-                                    default:{
-                                        pError("Invalid Operator");
-                                    }
-                                }
-                            }
-                        }
-                        if(workptr->next==NULL)
-                            break;
-                        else
-                            workptr=workptr->next;
-                    }
-                    if(condi_depth_cnt!=condi_match_cnt)
-                        break;
-                }
-                // 如果condi depth cnt 为 0， 则说明DBFile出错
-                if(condi_depth_cnt==0)
-                    pError("Table Broken");
-                else if(condi_depth_cnt==condi_match_cnt)
-                    offset_final.push(offset_after_index.top());
-
-                offset_after_index.pop();
-            }
-        }
-
-    }
-    else{
         // 获取索引失败，则逐行扫描
             off_t cur_offset=this->data_tb.storage_table[0].offset;
-            for(int i=0;i<this->data_tb.col_num;i++)
+            int row_num=(this->data_tb.storage_table[0].cur_offset-this->data_tb.storage_table[0].offset)/sizeof(row_itm);
+            
+            
+            for(int i=0;i<row_num;i++)
             {
                 int condi_depth_cnt=0;
                 int condi_match_cnt=0;
@@ -1775,17 +1794,17 @@ int DBMGR::Update(char * tbname,char *colname,val_union colvalue,UpdataCondi *co
                     pError();
                 
                 // 暂时未能找到删除之前索引的办法，忽略掉，对于短时间、小数据，应该不会影响
-                if((row_itm[i].flags&ATTR::PRIMARY)==ATTR::PRIMARY||
-                (row_itm[i].flags&ATTR::INDEX)==ATTR::INDEX)
-                {
-                    uint hashed=Hash::Murmur(&colvalue,sizeof(val_union))%27;
-                    this->Distribute(&colvalue,hashed,&idx_itm,offset_final.top());
-                    // 将 索引 写回 DBFile
-                    if(lseek(this->fd,idx_itm_offset,SEEK_SET)==-1)
-                        pError();
-                    if(write(this->fd,&idx_itm,sizeof(idx_itm))==-1)
-                        pError();
-                }
+                // if((row_itm[i].flags&ATTR::PRIMARY)==ATTR::PRIMARY||
+                // (row_itm[i].flags&ATTR::INDEX)==ATTR::INDEX)
+                // {
+                //     uint hashed=Hash::Murmur(&colvalue,sizeof(val_union))%27;
+                //     this->Distribute(&colvalue,hashed,&idx_itm,offset_final.top());
+                //     // 将 索引 写回 DBFile
+                //     if(lseek(this->fd,idx_itm_offset,SEEK_SET)==-1)
+                //         pError();
+                //     if(write(this->fd,&idx_itm,sizeof(idx_itm))==-1)
+                //         pError();
+                // }
 
                 
 
@@ -1821,35 +1840,34 @@ int DBMGR::DropRow(char * tbname,DropRowCondi *condi){
     bool found_value2data_table=false;
     index_item idx_itm;
     //用于更新索引后写回
-    off_t idx_itm_offset;
-    while(true)
-    {
-        if(workptr->opt==NEQUAL||workptr->opt==EQUAL)
-        {
-            // 遍历 idx_tb.item_info
-            for(int i=0;i<this->idx_tb.item_count;i++)
-            {
-                // 找到第一个索引列
-                if(!strcmp(this->idx_tb.item_info[i].column_name,workptr->first))
-                {
-                    found_value2data_table=true;
-                    if(lseek(this->fd,this->idx_tb.item_info[i].offset,SEEK_SET)==-1)
-                        pError();
-                    if(read(this->fd,&idx_itm,sizeof(idx_itm))==-1)
-                        pError();
-                    idx_itm_offset=this->idx_tb.item_info[i].offset;
-                    break;
-                }
-            }
-        }
-        
-        if(found_value2data_table)
-            break;
-        else if(workptr->next==NULL)
-            break;
-        else
-            workptr=workptr->next;
-    }
+    // off_t idx_itm_offset;
+    // while(true)
+    // {
+    //     if(workptr->opt==NEQUAL||workptr->opt==EQUAL)
+    //     {
+    //         // 遍历 idx_tb.item_info
+    //         for(int i=0;i<this->idx_tb.item_count;i++)
+    //         {
+    //             // 找到第一个索引列
+    //             if(!strcmp(this->idx_tb.item_info[i].column_name,workptr->first))
+    //             {
+    //                 found_value2data_table=true;
+    //                 if(lseek(this->fd,this->idx_tb.item_info[i].offset,SEEK_SET)==-1)
+    //                     pError();
+    //                 if(read(this->fd,&idx_itm,sizeof(idx_itm))==-1)
+    //                     pError();
+    //                 idx_itm_offset=this->idx_tb.item_info[i].offset;
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     if(found_value2data_table)
+    //         break;
+    //     else if(workptr->next==NULL)
+    //         break;
+    //     else
+    //         workptr=workptr->next;
+    // }
     
 
     // 最终完全匹配的偏移量
@@ -1858,223 +1876,226 @@ int DBMGR::DropRow(char * tbname,DropRowCondi *condi){
     row_item row_itm[this->data_tb.col_num];
 
     // 获取索引成功 当前索引树保存在 idx_itm ， 索引 value 在 workptr->second
-    if(found_value2data_table)
-    {
-        // 将 value2data_table 中匹配的偏移量保存到 offset_after_index 中
-        std::stack<off_t> offset_after_index;
+    // if(found_value2data_table)
+    // {
+    //     // 将 value2data_table 中匹配的偏移量保存到 offset_after_index 中
+    //     std::stack<off_t> offset_after_index;
         
-        value2data_table matched_table=this->LocateWithIndex(idx_itm,workptr->second);
-        for(int i=0;i<matched_table.count;i++)
-        {
-            if(!memcmp(&matched_table.value2data[i].value,&workptr->second,sizeof(val_union)))
-            {
-                offset_after_index.push(matched_table.value2data[i].offset);
-            }
-        }
-        // 未找到匹配项
-        if(offset_after_index.size()==0)
-            changed_count=0;
-        else{
-        // 找到若干匹配项，其偏移量保存在 offset_after_index 中
-            while(!offset_after_index.empty())
-            {
-                int condi_depth_cnt=0;
-                int condi_match_cnt=0;
-                //将其读入row_itm
-                if(lseek(this->fd,offset_after_index.top(),SEEK_SET)==-1)
-                    pError();
-                if(read(this->fd,row_itm,sizeof(row_itm))==-1)
-                    pError();
+    //     value2data_table matched_table=this->LocateWithIndex(idx_itm,workptr->second);
+    //     for(int i=0;i<matched_table.count;i++)
+    //     {
+    //         if(!memcmp(&matched_table.value2data[i].value,&workptr->second,sizeof(val_union)))
+    //         {
+    //             offset_after_index.push(matched_table.value2data[i].offset);
+    //         }
+    //     }
+    //     // 未找到匹配项
+    //     if(offset_after_index.size()==0)
+    //         changed_count=0;
+    //     else{
+    //     // 找到若干匹配项，其偏移量保存在 offset_after_index 中
+    //         while(!offset_after_index.empty())
+    //         {
+    //             int condi_depth_cnt=0;
+    //             int condi_match_cnt=0;
+    //             //将其读入row_itm
+    //             if(lseek(this->fd,offset_after_index.top(),SEEK_SET)==-1)
+    //                 pError();
+    //             if(read(this->fd,row_itm,sizeof(row_itm))==-1)
+    //                 pError();
                 
 
-                // 遍历 col_item[]
-                for(int i=0;i<this->data_tb.col_num;i++)
-                {
-                    workptr=condi;
-                    // 遍历 condi 链表
-                    while(true)
-                    {
-                        condi_depth_cnt++;
-                        // 如果 当前 workptr 指向的列数据 与 col_item[i] 匹配
-                        if(!strcmp(this->data_tb.col_itm[i].col_name,workptr->first))
-                        {
-                            if((this->data_tb.col_itm[i].flags&ATTR::INT)==ATTR::INT)
-                            {
-                                switch (workptr->opt){
-                                    case NEQUAL:{
-                                        if(workptr->second.i_val!=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //             // 遍历 col_item[]
+    //             for(int i=0;i<this->data_tb.col_num;i++)
+    //             {
+    //                 workptr=condi;
+    //                 // 遍历 condi 链表
+    //                 while(true)
+    //                 {
+    //                     condi_depth_cnt++;
+    //                     // 如果 当前 workptr 指向的列数据 与 col_item[i] 匹配
+    //                     if(!strcmp(this->data_tb.col_itm[i].col_name,workptr->first))
+    //                     {
+    //                         if((this->data_tb.col_itm[i].flags&ATTR::INT)==ATTR::INT)
+    //                         {
+    //                             switch (workptr->opt){
+    //                                 case NEQUAL:{
+    //                                     if(workptr->second.i_val!=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case LESS:{
-                                        if(workptr->second.i_val<row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LESS:{
+    //                                     if(workptr->second.i_val<row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case LEQUAL:{
-                                        if(workptr->second.i_val<=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LEQUAL:{
+    //                                     if(workptr->second.i_val<=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case EQUAL:{
-                                        if(workptr->second.i_val==row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case EQUAL:{
+    //                                     if(workptr->second.i_val==row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case GEUQAL:{
-                                        if(workptr->second.i_val>=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GEUQAL:{
+    //                                     if(workptr->second.i_val>=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case GREATER:{
-                                        if(workptr->second.i_val>row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GREATER:{
+    //                                     if(workptr->second.i_val>row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    default:{
-                                        pError("Invalid Operator");
-                                    }
-                                }
-                            }
-                            else if((this->data_tb.col_itm[i].flags&ATTR::DOUBLE)==ATTR::DOUBLE){
-                                switch (workptr->opt){
-                                    case NEQUAL:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)>EPS)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 default:{
+    //                                     pError("Invalid Operator");
+    //                                 }
+    //                             }
+    //                         }
+    //                         else if((this->data_tb.col_itm[i].flags&ATTR::DOUBLE)==ATTR::DOUBLE){
+    //                             switch (workptr->opt){
+    //                                 case NEQUAL:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)>EPS)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case LESS:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                        row_itm[i].value.d_val-workptr->second.d_val>EPS)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LESS:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+    //                                     row_itm[i].value.d_val-workptr->second.d_val>EPS)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case LEQUAL:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                        row_itm[i].value.d_val-workptr->second.d_val>EPS)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LEQUAL:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+    //                                     row_itm[i].value.d_val-workptr->second.d_val>EPS)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case EQUAL:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case EQUAL:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case GEUQAL:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                        workptr->second.d_val-row_itm[i].value.d_val>EPS)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GEUQAL:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+    //                                     workptr->second.d_val-row_itm[i].value.d_val>EPS)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case GREATER:{
-                                        if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
-                                        workptr->second.d_val-row_itm[i].value.d_val>EPS)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GREATER:{
+    //                                     if(fabs(workptr->second.d_val-row_itm[i].value.d_val)<EPS||
+    //                                     workptr->second.d_val-row_itm[i].value.d_val>EPS)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    default:{
-                                        pError("Invalid Operator");
-                                    }
-                                }
-                            }
-                            else if((this->data_tb.col_itm[i].flags&ATTR::STRING)==ATTR::STRING){
-                                switch (workptr->opt){
-                                    case NEQUAL:{
-                                        if(strcmp(workptr->second.c_val,row_itm[i].value.c_val))
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 default:{
+    //                                     pError("Invalid Operator");
+    //                                 }
+    //                             }
+    //                         }
+    //                         else if((this->data_tb.col_itm[i].flags&ATTR::STRING)==ATTR::STRING){
+    //                             switch (workptr->opt){
+    //                                 case NEQUAL:{
+    //                                     if(strcmp(workptr->second.c_val,row_itm[i].value.c_val))
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case EQUAL:{
-                                        if(!strcmp(workptr->second.c_val,row_itm[i].value.c_val))
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case EQUAL:{
+    //                                     if(!strcmp(workptr->second.c_val,row_itm[i].value.c_val))
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    default:{
-                                        pError("Invalid Operator");
-                                    }
-                                }
-                            }
-                            else if((this->data_tb.col_itm[i].flags&ATTR::TIME)==ATTR::TIME){
-                                switch (workptr->opt){
-                                    case NEQUAL:{
-                                        if(workptr->second.i_val!=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 default:{
+    //                                     pError("Invalid Operator");
+    //                                 }
+    //                             }
+    //                         }
+    //                         else if((this->data_tb.col_itm[i].flags&ATTR::TIME)==ATTR::TIME){
+    //                             switch (workptr->opt){
+    //                                 case NEQUAL:{
+    //                                     if(workptr->second.i_val!=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case LESS:{
-                                        if(workptr->second.i_val<row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LESS:{
+    //                                     if(workptr->second.i_val<row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case LEQUAL:{
-                                        if(workptr->second.i_val<=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case LEQUAL:{
+    //                                     if(workptr->second.i_val<=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case EQUAL:{
-                                        if(workptr->second.i_val==row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case EQUAL:{
+    //                                     if(workptr->second.i_val==row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case GEUQAL:{
-                                        if(workptr->second.i_val>=row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GEUQAL:{
+    //                                     if(workptr->second.i_val>=row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    case GREATER:{
-                                        if(workptr->second.i_val>row_itm[i].value.i_val)
-                                            condi_match_cnt++;
+    //                                     break;
+    //                                 }
+    //                                 case GREATER:{
+    //                                     if(workptr->second.i_val>row_itm[i].value.i_val)
+    //                                         condi_match_cnt++;
                                         
-                                        break;
-                                    }
-                                    default:{
-                                        pError("Invalid Operator");
-                                    }
-                                }
-                            }
-                        }
-                        if(workptr->next==NULL)
-                            break;
-                        else
-                            workptr=workptr->next;
-                    }
-                    if(condi_depth_cnt!=condi_match_cnt)
-                        break;
-                }
-                // 如果condi depth cnt 为 0， 则说明DBFile出错
-                if(condi_depth_cnt==0)
-                    pError("Table Broken");
-                else if(condi_depth_cnt==condi_match_cnt)
-                    offset_final.push(offset_after_index.top());
+    //                                     break;
+    //                                 }
+    //                                 default:{
+    //                                     pError("Invalid Operator");
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                     if(workptr->next==NULL)
+    //                         break;
+    //                     else
+    //                         workptr=workptr->next;
+    //                 }
+    //                 if(condi_depth_cnt!=condi_match_cnt)
+    //                     break;
+    //             }
+    //             // 如果condi depth cnt 为 0， 则说明DBFile出错
+    //             if(condi_depth_cnt==0)
+    //                 pError("Table Broken");
+    //             else if(condi_depth_cnt==condi_match_cnt)
+    //                 offset_final.push(offset_after_index.top());
 
-                offset_after_index.pop();
-            }
-        }
+    //             offset_after_index.pop();
+    //         }
+    //     }
 
-    }
-    else{
+    // }
+    // else
+    {
     // 获取索引失败，则逐行扫描
             off_t cur_offset=this->data_tb.storage_table[0].offset;
-            for(int i=0;i<this->data_tb.col_num;i++)
+            int row_num=(this->data_tb.storage_table[0].cur_offset-this->data_tb.storage_table[0].offset)/sizeof(row_itm);
+            
+            for(int i=0;i<row_num;i++)
             {
                 int condi_depth_cnt=0;
                 int condi_match_cnt=0;
@@ -2280,20 +2301,44 @@ int DBMGR::DropRow(char * tbname,DropRowCondi *condi){
     off_t row_offset;
 
 
+
+    void * buffer=(void *)malloc(MAX_DATA_STORAGE_SIZE);
     // 将 row_itm 清零，用于清零覆盖文件内容
     memset(row_itm,0,sizeof(row_itm));
 
     while(!offset_final.empty())
     {
+        // 将之后的有效数据写入buffer
+        if(lseek(this->fd,offset_final.top()+sizeof(row_itm),SEEK_SET)==-1)
+            pError();
+
+        if(read(this->fd,buffer,this->data_tb.storage_table[0].cur_offset-(offset_final.top()+sizeof(row_itm)))==-1)
+            pError();
+
+        // if(write(this->fd,buffer,this->data_tb.storage_table[0].cur_offset-(offset_final.top()+sizeof(row_itm)))==-1)
+        //     pError();
+
+
+        // 将buffer的有效数据写入DBFILE
         if(lseek(this->fd,offset_final.top(),SEEK_SET)==-1)
             pError();
-        if(write(this->fd,row_itm,sizeof(row_itm))==-1)
+        if(write(this->fd,buffer,this->data_tb.storage_table[0].cur_offset-(offset_final.top()+sizeof(row_itm)))==-1)
             pError();
+
+        this->data_tb.storage_table[0].cur_offset-=sizeof(row_itm);
+
+
 
         changed_count++;
         offset_final.pop();
     }
 
+
+    // 写回 data_tb
+    if(lseek(this->fd,this->data_tb_info.data_offset,SEEK_SET)==-1)
+        pError();
+    if(write(this->fd,&this->data_tb,sizeof(this->data_tb))==-1)
+        pError();
 
     return changed_count;
 

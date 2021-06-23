@@ -54,6 +54,11 @@ static void MQThread(union sigval sv)
             printf("Message Broken");
         // printf("%s",buff);
         memcpy(&uni_cmd,buff,sizeof(CMD::UniCMD));
+
+
+
+
+        
         //在本函数中处理Worker发送数据
         //创建 fifo
         char *path=(char *)malloc(20*sizeof(char));
@@ -72,7 +77,7 @@ static void MQThread(union sigval sv)
         if(fifo_fd==-1)
                 printf("ERROR open(): %s\n",strerror(errno));
         else
-        {   
+        {
             // 处理，访问数据库
             switch(uni_cmd.action){
                 case CMD::CREATE_TB:{

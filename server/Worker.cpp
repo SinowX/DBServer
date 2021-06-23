@@ -24,11 +24,11 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
     cmd_pack the_pack;
     memcpy(&the_pack,buff,sizeof(cmd_pack));
     printf("Action: %s\n",the_pack.act);
-    // printf("PreObj: %s\n",the_pack.preobj);
-    // printf("Object: %s\n",the_pack.obj);
-    // printf("Exec: %s\n",the_pack.exec);
-    // printf("Condi: %s\n",the_pack.condi);
-    // printf("Complete.\n");
+    printf("PreObj: %s\n",the_pack.preobj);
+    printf("Object: %s\n",the_pack.obj);
+    printf("Exec: %s\n",the_pack.exec);
+    printf("Condi: %s\n",the_pack.condi);
+    printf("Complete.\n");
 
     if(!strcmp(the_pack.act,"create"))
     {
@@ -142,6 +142,7 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
         {
             if(the_pack.exec[i]==';')
             {
+                printf("semicolon: %d\n",i);
                 semiColonIndex[semiColonCnt]=i;
                 semiColonCnt++;
             }
@@ -164,6 +165,7 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
                 strncpy(name_value,&the_pack.exec[semiColonIndex[i-1]+1],semiColonIndex[i]-semiColonIndex[i-1]-1);
                 name_value[semiColonIndex[i]-semiColonIndex[i-1]]='\0';
             }
+            printf("Name-Value: %s\n",name_value);
             // 现在 name_value 保存着 name=value
             char *value_str=(char *)malloc(ROW_VALUE_SIZE*sizeof(char));
             for(int j=0;j<strlen(name_value);j++)
@@ -174,15 +176,20 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
                     strncpy(uni_cmd->colval[i].name,&name_value[0],j-0);
                     uni_cmd->colval[i].name[j]='\0';
                     
+                    printf("colName: %s\n",uni_cmd->colval[i].name);
+
                     strncpy(value_str,&name_value[j+1],strlen(name_value)-(j+1));
                     value_str[strlen(name_value)-(j+1)]='\0';
                     
+                    printf("value_str: %s\n",value_str);
                     uint8_t value_type=3;
                     for(int k=0;k<strlen(value_str);k++)
                     {
-                        if(value_str[i]>='0'&&value_str[i]<='9')
-                            value_type=1;
-                        else if(value_str[i]=='.')
+                        // printf(value_str[k])
+                        if(value_str[k]>='0'&&value_str[k]<='9')
+                            if(value_type!=2)
+                                value_type=1;
+                        else if(value_str[k]=='.')
                             value_type=2;
                         else
                         {
@@ -198,16 +205,21 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
                         memset(&uni_cmd->colval[i].value,0,sizeof(val_union));
                         uni_cmd->colval[i].value.i_val=atoi(value_str);
                         /* code */
+                        printf("this is int\n");
                         break;
                     case 2:
                         // double
                         uni_cmd->colval[i].flags=ATTR::DOUBLE;
                         uni_cmd->colval[i].value.d_val=atof(value_str);
+                        
+                        printf("this is double\n");
                         break;
                     case 3:
                         // string
                         uni_cmd->colval[i].flags=ATTR::STRING;
                         strcpy(uni_cmd->colval[i].value.c_val,value_str);
+
+                        printf("this is string\n");
                         break;
                     default:
                         printf("UNKNOWN ERROR\n");
@@ -806,6 +818,8 @@ int main(int argc, char *argv[])
     while(true)
     {
         int stat=read(curFd,buff,sizeof(cmd_pack));
+        printf("sizeof)cmd_pack): %d\n",sizeof(cmd_pack));
+        printf("read: %d\n",stat);
         if(stat==0||stat==-1)
         {
             exit(stat);
