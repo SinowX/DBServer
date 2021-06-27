@@ -1177,7 +1177,7 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
                 string_swapper.append(",\n");
             }
             else{
-                string_swapper.append("\n        }");
+                string_swapper.append("\n        }\n");
             }
 
 
@@ -1194,7 +1194,7 @@ char * DBMGR::Select(char * tbname,SelectCol *col,SelectCondi *condi){
 
     }
 
-    string_swapper.append("    ]\n}");
+    string_swapper.append("    ]\n}\n");
 
     strcpy(str_swapper,string_swapper.c_str());
 

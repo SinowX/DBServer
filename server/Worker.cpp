@@ -22,6 +22,7 @@ mqd_t msg_q;
 bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
 {
     cmd_pack the_pack;
+    printf("%s\n",buff);
     memcpy(&the_pack,buff,sizeof(cmd_pack));
     printf("Action: %s\n",the_pack.act);
     printf("PreObj: %s\n",the_pack.preobj);
@@ -30,6 +31,8 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
     printf("Condi: %s\n",the_pack.condi);
     printf("Complete.\n");
 
+
+    printf("%s\n",the_pack.act);
     if(!strcmp(the_pack.act,"create"))
     {
         uni_cmd->action=CMD::CREATE_TB;
@@ -163,7 +166,7 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
             else
             {
                 strncpy(name_value,&the_pack.exec[semiColonIndex[i-1]+1],semiColonIndex[i]-semiColonIndex[i-1]-1);
-                name_value[semiColonIndex[i]-semiColonIndex[i-1]]='\0';
+                name_value[semiColonIndex[i]-(semiColonIndex[i-1]+1)]='\0';
             }
             printf("Name-Value: %s\n",name_value);
             // 现在 name_value 保存着 name=value
@@ -614,6 +617,8 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
         
         //condi
 
+        printf("the_pack.condi: %s\n",the_pack.condi);
+
         if(strlen(the_pack.condi)==0)
         {
             //不限制条件
@@ -632,6 +637,8 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
 
             uni_cmd->condi_num=semiColonCnt;
 
+
+            printf("uni_cmd.condi_num: %d\n",uni_cmd->condi_num);
             
             char *name_value=(char *)malloc((ROW_VALUE_SIZE*2)*sizeof(char));
 
@@ -647,6 +654,8 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
                     strncpy(name_value,&the_pack.condi[semiColonIndex[i-1]+1],semiColonIndex[i]-(semiColonIndex[i-1]+1));
                     name_value[semiColonIndex[i]-(semiColonIndex[i-1]+1)]='\0';
                 }
+                printf("Name Value: %s\n",name_value);
+
                 // 现在 name_value 保存着 name=value
                 char *value_str=(char *)malloc(ROW_VALUE_SIZE*sizeof(char));
                 for(int j=0;j<strlen(name_value);j++)
@@ -742,7 +751,7 @@ bool Unpack(char *buff,CMD::UniCMD *uni_cmd)
     }
     else
     {
-        printf("ERROR Unpack() : %s\n",strerror(errno));
+        printf("ERROR Unpack()\n");
         return false;
     }
 
@@ -855,6 +864,12 @@ int main(int argc, char *argv[])
             {
                 if(read(fifo_fd,fifo_buff,BUF_SZ)!=-1)
                 {
+
+                    printf("strlen fifo_buff: %d\n",strlen(fifo_buff));
+                    for(int i=0;i<100;i++)
+                    {
+                        printf("%c",fifo_buff[4080+i]);
+                    }
                     write(fd,fifo_buff,BUF_SZ);
                 }
                 printf("%s\n",fifo_buff);

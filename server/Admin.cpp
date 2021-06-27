@@ -72,7 +72,7 @@ static void MQThread(union sigval sv)
         //     unlink(path); // 创建该 fifo 成功的 一方 进行 unlink
         
         char *fifo_buff=(char *)malloc(BUF_SZ*sizeof(char));       
-        strcpy(fifo_buff,"Hello This is from Your Admin...");
+        // strcpy(fifo_buff,"Hello This is from Your Admin...");
         int fifo_fd=open(path,O_WRONLY);
         if(fifo_fd==-1)
                 printf("ERROR open(): %s\n",strerror(errno));
@@ -159,6 +159,9 @@ static void MQThread(union sigval sv)
 
                     // 如果错误，应该返回错误信息，并由fifo_buff 发送给worker
                     fifo_buff=dbmgr.Select(uni_cmd.tbname,col,condi);
+
+
+                    printf("strlen fifo_buff: %d\n",strlen(fifo_buff));
                     if(write(fifo_fd,fifo_buff,BUF_SZ)==-1)
                         printf("ERROR write(): %s\n",strerror(errno));
                     break;
@@ -273,7 +276,7 @@ static void MQThread(union sigval sv)
                         changeNum=dbmgr.Update(uni_cmd.tbname,uni_cmd.colname,uni_cmd.colval[0].value,uni_cmd.condi);
                         if(changeNum!=0)
                         {
-                            sprintf(fifo_buff,"%d Updates\n",changeNum);
+                            sprintf(fifo_buff,"%d Updates\n\0",changeNum);
                             // strcpy(fifo_buff,"Update Success");
                             if(write(fifo_fd,fifo_buff,BUF_SZ)==-1)
                                 printf("ERROR write(): %s\n",strerror(errno));
